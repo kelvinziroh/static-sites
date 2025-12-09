@@ -21,7 +21,7 @@ class TestTextNode(unittest.TestCase):
     def test_repr(self):
         node = TextNode("This is a text node", TextType.LINK_TEXT, "http://link_nodes.com")
         self.assertEqual(
-            "TextNode(This is a text node, link, http://link_nodes.com)", repr(node)
+            "TextNode(\"This is a text node\", link, \"http://link_nodes.com\")", repr(node)
         )
 
 class TestTextToHTML(unittest.TestCase):
