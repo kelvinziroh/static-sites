@@ -99,3 +99,21 @@ class TestInlineMD(unittest.TestCase):
             matches,
             [("targaryen sigil", "https://i.imgur.com/ji3Jlsa3.png"), ("", "https://i.imgur.com/mi3NlFa4.png")]
         )
+    
+    def test_extract_images_only(self):
+        matches = extract_markdown_images(
+            "House Targaryen: ![targaryen sigil](https://i.imgur.com/ji3Jlsa3.png). [learn more](https://gotfandom/houses/sigils/targaryen.com)"
+        )
+        self.assertListEqual(
+            matches,
+            [("targaryen sigil", "https://i.imgur.com/ji3Jlsa3.png")]
+        )
+
+    def test_extract_links(self):
+        pass
+    
+    def text_extract_multiple_links(self):
+        pass
+    
+    def text_extract_links_only(self):
+        pass
