@@ -110,10 +110,28 @@ class TestInlineMD(unittest.TestCase):
         )
 
     def test_extract_links(self):
-        pass
+        matches = extract_markdown_links(
+            "House [Targaryen](https://gotfandom/houses/targaryen.com)"
+        )
+        self.assertListEqual(
+            matches,
+            [("Targaryen", "https://gotfandom/houses/targaryen.com")]
+        )
     
     def text_extract_multiple_links(self):
-        pass
+        matches = extract_markdown_links(
+            "Houses [Targaryen](https://gotfandom/houses/targaryen.com), [Martell](https://gotfandom/houses/martell.com) and [Dorn](https://https://gotfandom/houses/dorn.com)"
+        )
+        self.assertListEqual(
+            matches,
+            [("Targaryen", "https://gotfandom/houses/targaryen.com"), ("Martell", "https://gotfandom/houses/martell.com"), ("Dorn", "https://https://gotfandom/houses/dorn.com")]
+        )
     
     def text_extract_links_only(self):
-        pass
+        matches = extract_markdown_images(
+            "House Targaryen: ![targaryen sigil](https://i.imgur.com/ji3Jlsa3.png). [learn more](https://gotfandom/houses/sigils/targaryen.com)"
+        )
+        self.assertListEqual(
+            matches,
+            [("learn more", "https://gotfandom/houses/sigils/targaryen.com")]
+        )
