@@ -146,6 +146,50 @@ class TestInlineMD(unittest.TestCase):
             ]
         )
     
+    def test_split_links(self):
+        node = TextNode("House [Targaryen](https://gotfandom/houses/targaryen.com) has a sigil of three dragon heads", TextType.PLAIN_TEXT)
+        new_nodes = split_nodes_link([node])
+        self.assertListEqual(
+            new_nodes,
+            [
+                TextNode("House ", TextType.PLAIN_TEXT),
+                TextNode("Targaryen", TextType.LINK_TEXT, "https://gotfandom/houses/targaryen.com"),
+                TextNode(" has a sigil of three dragon heads", TextType.PLAIN_TEXT)
+            ]
+        )
+
+    def test_split_links_beginning(self):
+        node = TextNode("[Targaryen](https://gotfandom/houses/targaryen.com) house with a sigil of three dragon heads", TextType.PLAIN_TEXT)
+        new_nodes = split_nodes_link([node])
+        self.assertListEqual(
+            new_nodes,
+            [
+                TextNode("Targaryen", TextType.LINK_TEXT, "https://gotfandom/houses/targaryen.com"),
+                TextNode(" house with a sigil of three dragon heads", TextType.PLAIN_TEXT)
+            ]
+        )
+    
+    def test_split_links_end(self):
+        node = TextNode("House [Targaryen](https://gotfandom/houses/targaryen.com)", TextType.PLAIN_TEXT)
+        new_nodes = split_nodes_link([node])
+        self.assertListEqual(
+            new_nodes,
+            [
+                TextNode("House ", TextType.PLAIN_TEXT),
+                TextNode("Targaryen", TextType.LINK_TEXT, "https://gotfandom/houses/targaryen.com")
+            ]
+        )
+    
+    def test_split_links_only(self):
+        node = TextNode("[House Targaryen](https://gotfandom/houses/targaryen.com)", TextType.PLAIN_TEXT)
+        new_nodes = split_nodes_link([node])
+        self.assertListEqual(
+            new_nodes,
+            [
+                TextNode("House Targaryen", TextType.LINK_TEXT, "https://gotfandom/houses/targaryen.com")
+            ]
+        )
+    
     def test_extract_image(self):
         matches = extract_markdown_images(
             "House Targaryen: ![targaryen sigil](https://i.imgur.com/ji3Jlsa3.png)"
