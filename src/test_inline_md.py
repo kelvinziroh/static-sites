@@ -16,6 +16,16 @@ class TestInlineMD(unittest.TestCase):
             ]
         )
     
+    def test_bold_only(self):
+        node = TextNode("**'Winter is coming!'**", TextType.PLAIN_TEXT)
+        new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD_TEXT)
+        self.assertListEqual(
+            new_nodes,
+            [
+                TextNode("'Winter is coming!'", TextType.BOLD_TEXT)
+            ]
+        )
+    
     def test_italic_md(self):
         node = TextNode("He leaned in close. _'Winter is coming'_, he said.", TextType.PLAIN_TEXT)
         new_nodes = split_nodes_delimiter([node], "_", TextType.ITALIC_TEXT)
@@ -79,6 +89,60 @@ class TestInlineMD(unittest.TestCase):
                 TextNode(", he said. ", TextType.PLAIN_TEXT),
                 TextNode("'Chaos is a ladder'", TextType.ITALIC_TEXT),
                 TextNode(", he continued.", TextType.PLAIN_TEXT)
+            ]
+        )
+    
+    def test_split_images(self):
+        node = TextNode(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)",
+            TextType.PLAIN_TEXT
+        )
+        new_nodes = split_nodes_image([node])
+        self.assertListEqual(
+            new_nodes,
+            [
+                TextNode("This is text with an ", TextType.PLAIN_TEXT),
+                TextNode("image", TextType.IMAGE_TEXT, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and another ", TextType.PLAIN_TEXT),
+                TextNode(
+                    "second image", TextType.IMAGE_TEXT, "https://i.imgur.com/3elNhQu.png"
+                )
+            ]
+        )
+    
+    def test_split_images_beginning(self):
+        node = TextNode(
+            "![targaryen sigil](https://i.imgur.com/ji3Jlsa3.png): House Targaryen", TextType.PLAIN_TEXT
+        )
+        new_nodes = split_nodes_image([node])
+        self.assertListEqual(
+            new_nodes,
+            [
+                TextNode("targaryen sigil", TextType.IMAGE_TEXT, "https://i.imgur.com/ji3Jlsa3.png"),
+                TextNode(": House Targaryen", TextType.PLAIN_TEXT)
+            ]
+        )
+    
+    def test_split_images_end(self):
+        node = TextNode(
+            "House Targaryen: ![targaryen sigil](https://i.imgur.com/ji3Jlsa3.png)", TextType.PLAIN_TEXT
+        )
+        new_nodes = split_nodes_image([node])
+        self.assertListEqual(
+            new_nodes,
+            [
+                TextNode("House Targaryen: ", TextType.PLAIN_TEXT),
+                TextNode("targaryen sigil", TextType.IMAGE_TEXT, "https://i.imgur.com/ji3Jlsa3.png")
+            ]
+        )
+        
+    def test_split_image_only(self):
+        node = TextNode("![targaryen sigil](https://i.imgur.com/ji3Jlsa3.png)", TextType.PLAIN_TEXT)
+        new_nodes = split_nodes_image([node])
+        self.assertListEqual(
+            new_nodes,
+            [
+                TextNode("targaryen sigil", TextType.IMAGE_TEXT, "https://i.imgur.com/ji3Jlsa3.png")
             ]
         )
     
