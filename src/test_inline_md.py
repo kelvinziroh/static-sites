@@ -243,3 +243,21 @@ class TestInlineMD(unittest.TestCase):
             matches,
             [("learn more", "https://gotfandom/houses/sigils/targaryen.com")]
         )
+    
+    def test_text_to_textnodes(self):
+        input_text = "He paused... **'Do or do not'**, master Yoda said, _'there is no try'_, he continued. ![obi wan kenobi](https://i.imgur.com/fJRm4vk.jpeg) and may the [force](https://starwarsfandom.com) be with you"
+        new_nodes = text_to_textnodes(input_text)
+        self.assertListEqual(
+            new_nodes,
+            [
+                TextNode("He paused... ", TextType.PLAIN_TEXT),
+                TextNode("'Do or do not'", TextType.BOLD_TEXT),
+                TextNode(", master Yoda said, ", TextType.PLAIN_TEXT),
+                TextNode("'there is no try'", TextType.ITALIC_TEXT),
+                TextNode(", he continued. ", TextType.PLAIN_TEXT),
+                TextNode("obi wan kenobi", TextType.IMAGE_TEXT, "https://i.imgur.com/fJRm4vk.jpeg"),
+                TextNode(" and may the ", TextType.PLAIN_TEXT),
+                TextNode("force", TextType.LINK_TEXT, "https://starwarsfandom.com"),
+                TextNode(" be with you", TextType.PLAIN_TEXT)
+            ]
+        )
