@@ -33,16 +33,20 @@ def split_nodes_image(old_nodes):
             new_nodes.append(node)
             continue
         
-        img_txts = extract_markdown_images(node.text)
+        original_txt = node.text
+        img_txts = extract_markdown_images(original_txt)
         
         if not img_txts:
             new_nodes.append(node)
+            continue
         
-        original_txt = node.text
         for i in range(len(img_txts)):
             img_alt, img_link = img_txts[i][0], img_txts[i][1]
             delimiter = f"![{img_alt}]({img_link})"
             split_txts = original_txt.split(delimiter, 1)
+            
+            if len(split_txts) != 2:
+                raise ValueError("Invalid markdown")
             
             if split_txts[0] != "":
                 new_nodes.append(TextNode(split_txts[0], TextType.PLAIN_TEXT))
@@ -64,17 +68,21 @@ def split_nodes_link(old_nodes):
             new_nodes.append(node)
             continue
         
-        link_txts = extract_markdown_links(node.text)
+        original_txt = node.txt
+        link_txts = extract_markdown_links(original_txt)
         
         if not link_txts:
             new_nodes.append(node)
-        
-        original_txt = node.text
+            continue
+
         for i in range(len(link_txts)):
             a_txt, a_link = link_txts[i][0], link_txts[i][1]
             delimiter = f"[{a_txt}]({a_link})"
             split_txts = original_txt.split(delimiter, 1)
             
+            if len(split_txts) != 2:
+                raise ValueError("Invalid markdown")
+
             if split_txts[0] != "":
                 new_nodes.append(TextNode(split_txts[0], TextType.PLAIN_TEXT))
             
