@@ -20,7 +20,7 @@ def block_to_block_type(block):
         return BlockType.HEADING
     elif re.match(r"^`{3}\n?.*\n?`{3}$", block):
         return BlockType.CODE
-    elif re.match(r">\s", block):
+    elif re.match(r"^>\s.*", block):
         return BlockType.QUOTE
     elif re.match(r"^(-\s.*\n)+", block):
         return BlockType.UL
