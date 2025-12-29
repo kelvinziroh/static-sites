@@ -64,7 +64,13 @@ def markdown_to_html_node(markdown):
             html_nodes.append(ParentNode("ol", list_nodes))
 
         if block_type == BlockType.QUOTE:
-            pass
+            text = re.sub(r"^>\s", "", block).strip()
+            textnodes = text_to_textnodes(text)
+            leafnodes = []
+            for node in textnodes:
+                leafnodes.append(text_node_to_html_node(node))
+
+            html_nodes.append(ParentNode("blockquote", leafnodes))
 
         if block_type == BlockType.PARAGRAPH:
             pass
