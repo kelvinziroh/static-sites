@@ -38,10 +38,30 @@ def markdown_to_html_node(markdown):
                 )  # h{#} html parent node with the leafnodes as its children
 
         if block_type == BlockType.UL:
-            pass
+            text = re.sub(r"^-\s", "", block, flags=re.MULTILINE)
+            list_items = text.strip().split("\n")
+            list_nodes = []
+            for item in list_items:
+                textnodes = text_to_textnodes(item)
+                leafnodes = []
+                for node in textnodes:
+                    leafnodes.append(text_node_to_html_node(node))
+                list_nodes.append(ParentNode("li", leafnodes))
+
+            html_nodes.append(ParentNode("ul", list_nodes))
 
         if block_type == BlockType.OL:
-            pass
+            text = re.sub(r"^\d+\.\s", "", block, flags=re.MULTILINE)
+            list_items = text.strip().split("\n")
+            list_nodes = []
+            for item in list_items:
+                textnodes = text_to_textnodes(item)
+                leafnodes = []
+                for node in textnodes:
+                    leafnodes.append(text_node_to_html_node(node))
+                list_nodes.append(ParentNode("li", leafnodes))
+
+            html_nodes.append(ParentNode("ol", list_nodes))
 
         if block_type == BlockType.QUOTE:
             pass
