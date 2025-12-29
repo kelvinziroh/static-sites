@@ -73,7 +73,13 @@ def markdown_to_html_node(markdown):
             html_nodes.append(ParentNode("blockquote", leafnodes))
 
         if block_type == BlockType.PARAGRAPH:
-            pass
+            text = block.strip()
+            textnodes = text_to_textnodes(text)
+            leafnodes = []
+            for node in textnodes:
+                leafnodes.append(text_node_to_html_node(node))
+
+            html_nodes.append(ParentNode("p", leafnodes))
 
         if block_type == BlockType.CODE:
             pass
