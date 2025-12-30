@@ -64,7 +64,7 @@ def markdown_to_html_node(markdown):
             html_nodes.append(ParentNode("ol", list_nodes))
 
         if block_type == BlockType.QUOTE:
-            text = re.sub(r"^>\s", "", block).strip()
+            text = re.sub(r"^>\s", "", block).strip().replace("\n", " ")
             textnodes = text_to_textnodes(text)
             leafnodes = []
             for node in textnodes:
@@ -73,7 +73,7 @@ def markdown_to_html_node(markdown):
             html_nodes.append(ParentNode("blockquote", leafnodes))
 
         if block_type == BlockType.PARAGRAPH:
-            text = block.strip()
+            text = block.strip().replace("\n", " ")
             textnodes = text_to_textnodes(text)
             leafnodes = []
             for node in textnodes:
@@ -82,9 +82,13 @@ def markdown_to_html_node(markdown):
             html_nodes.append(ParentNode("p", leafnodes))
 
         if block_type == BlockType.CODE:
-            pass
+            text = re.sub(r"^`{3}|`{3}$", "", block).strip()
+            leafnodes = [LeafNode(None, text)]
+            code_node = ParentNode("code", leafnodes)
+            html_nodes.append(ParentNode("pre", code_node))
 
-    return html_nodes
+    final_node = ParentNode("div", html_nodes)
+    return final_node
 
 
 def markdown_to_blocks(markdown):
