@@ -26,7 +26,7 @@ def markdown_to_html_node(markdown):
         if block_type == BlockType.HEADING:
             match = re.match(r"^(#+)\s", block)
             if match:
-                heading_text = re.sub(r"^#+\s*", "", block).replace("\n", "")
+                heading_text = re.sub(r"^#+\s*", "", block).replace("\n", " ")
                 hash_count = len(match.group(1))
                 textnodes = text_to_textnodes(heading_text)  # a list of text nodes
                 leafnodes = []  # create a list of leafnodes from textnodes
@@ -64,7 +64,7 @@ def markdown_to_html_node(markdown):
             html_nodes.append(ParentNode("ol", list_nodes))
 
         if block_type == BlockType.QUOTE:
-            text = re.sub(r"^>\s", "", block).strip().replace("\n", "")
+            text = re.sub(r"^>\s", "", block).strip().replace("\n", " ")
             textnodes = text_to_textnodes(text)
             leafnodes = []
             for node in textnodes:
@@ -73,7 +73,7 @@ def markdown_to_html_node(markdown):
             html_nodes.append(ParentNode("blockquote", leafnodes))
 
         if block_type == BlockType.PARAGRAPH:
-            text = block.strip().replace("\n", "")
+            text = block.strip().replace("\n", " ")
             textnodes = text_to_textnodes(text)
             leafnodes = []
             for node in textnodes:
@@ -82,10 +82,9 @@ def markdown_to_html_node(markdown):
             html_nodes.append(ParentNode("p", leafnodes))
 
         if block_type == BlockType.CODE:
-            text = re.sub(r"^`{3}|`{3}$", "", block).strip()
-            leafnodes = [LeafNode(None, text)]
-            code_node = ParentNode("code", leafnodes)
-            html_nodes.append(ParentNode("pre", code_node))
+            text = re.sub(r"^`{3}|`{3}$", "", block).lstrip()
+            leafnodes = [LeafNode("code", text)]
+            html_nodes.append(ParentNode("pre", leafnodes))
 
     final_node = ParentNode("div", html_nodes)
     return final_node
@@ -99,7 +98,6 @@ def markdown_to_blocks(markdown):
 def block_to_block_type(block):
     if re.match(r"^#{1,6}\s.+", block):
         return BlockType.HEADING
-    # elif re.match(r"^`{3}\n?.*\n?`{3}$", block):
     elif re.match(r"^`{3}|`{3}$", block):
         return BlockType.CODE
     elif re.match(r"^>\s.*", block):
