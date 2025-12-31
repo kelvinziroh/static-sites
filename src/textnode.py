@@ -1,5 +1,7 @@
 from enum import Enum
+
 from htmlnode import LeafNode
+
 
 class TextType(Enum):
     PLAIN_TEXT = "plain"
@@ -18,15 +20,16 @@ class TextNode:
 
     def __eq__(self, other):
         return (
-                self.text == other.text 
-                and self.text_type == other.text_type 
-                and self.url == other.url)
-    
+            self.text == other.text
+            and self.text_type == other.text_type
+            and self.url == other.url
+        )
+
     def __repr__(self):
         if self.url:
-            return f"TextNode(\"{self.text}\", {self.text_type.value}, \"{self.url}\")"
+            return f'TextNode("{self.text}", {self.text_type.value}, "{self.url}")'
         else:
-            return f"TextNode(\"{self.text}\", {self.text_type.value})"
+            return f'TextNode("{self.text}", {self.text_type.value})'
 
 
 def text_node_to_html_node(text_node):
@@ -41,6 +44,8 @@ def text_node_to_html_node(text_node):
     elif text_node.text_type == TextType.LINK_TEXT:
         return LeafNode("a", text_node.text, {"href": f"{text_node.url}"})
     elif text_node.text_type == TextType.IMAGE_TEXT:
-        return LeafNode("img", None, {"src": f"{text_node.url}", "alt": f"{text_node.text}"})
+        return LeafNode(
+            "img", "", {"src": f"{text_node.url}", "alt": f"{text_node.text}"}
+        )
     else:
         return LeafNode(None, text_node.text)
