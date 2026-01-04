@@ -16,78 +16,90 @@ class BlockType(Enum):
 
 
 def markdown_to_html_node(markdown):
-    html_nodes = []
     md_blocks = markdown_to_blocks(markdown)
-
+    html_nodes = []
     for block in md_blocks:
-        # get the block type
-        block_type = block_to_block_type(block)
+        html_nodes.append(md_block_to_html_block(block))
 
-        if block_type == BlockType.HEADING:
-            match = re.match(r"^(#+)\s", block)
-            if match:
-                heading_text = re.sub(r"^#+\s*", "", block).replace("\n", " ")
-                hash_count = len(match.group(1))
-                textnodes = text_to_textnodes(heading_text)  # a list of text nodes
-                leafnodes = []  # create a list of leafnodes from textnodes
-                for node in textnodes:
-                    leafnodes.append(text_node_to_html_node(node))
+    return ParentNode("div", html_nodes)
 
-                html_nodes.append(
-                    ParentNode(f"h{hash_count}", leafnodes)
-                )  # h{#} html parent node with the leafnodes as its children
 
-        if block_type == BlockType.UL:
-            text = re.sub(r"^-\s", "", block, flags=re.MULTILINE)
-            list_items = text.strip().split("\n")
-            list_nodes = []
-            for item in list_items:
-                textnodes = text_to_textnodes(item)
-                leafnodes = []
-                for node in textnodes:
-                    leafnodes.append(text_node_to_html_node(node))
-                list_nodes.append(ParentNode("li", leafnodes))
+def md_block_to_html_block(block):
+    # get the block type
+    block_type = block_to_block_type(block)
 
-            html_nodes.append(ParentNode("ul", list_nodes))
+    if block_type == BlockType.HEADING:
+        return heading_blocks(block)
+    if block_type == BlockType.UL:
+        return ulist_blocks(block)
+    if block_type == BlockType.OL:
+        return olist_blocks(block)
+    if block_type == BlockType.QUOTE:
+        return blockquote_blocks(block)
+    if block_type == BlockType.PARAGRAPH:
+        return paragraph_blocks(block)
+    if block_type == BlockType.CODE:
+        return code_blocks(block)
 
-        if block_type == BlockType.OL:
-            text = re.sub(r"^\d+\.\s", "", block, flags=re.MULTILINE)
-            list_items = text.strip().split("\n")
-            list_nodes = []
-            for item in list_items:
-                textnodes = text_to_textnodes(item)
-                leafnodes = []
-                for node in textnodes:
-                    leafnodes.append(text_node_to_html_node(node))
-                list_nodes.append(ParentNode("li", leafnodes))
 
-            html_nodes.append(ParentNode("ol", list_nodes))
+def heading_blocks(block):
+    match = re.match(r"^(#+)\s", block)
+    if match:
+        heading_text = re.sub(r"^#+\s*", "", block).replace("\n", " ")
+        hash_count = len(match.group(1))
+        leafnodes = text_to_html_nodes(heading_text)
 
-        if block_type == BlockType.QUOTE:
-            text = re.sub(r"^>\s", "", block).strip().replace("\n", " ")
-            textnodes = text_to_textnodes(text)
-            leafnodes = []
-            for node in textnodes:
-                leafnodes.append(text_node_to_html_node(node))
+        return ParentNode(f"h{hash_count}", leafnodes)
 
-            html_nodes.append(ParentNode("blockquote", leafnodes))
 
-        if block_type == BlockType.PARAGRAPH:
-            text = block.strip().replace("\n", " ")
-            textnodes = text_to_textnodes(text)
-            leafnodes = []
-            for node in textnodes:
-                leafnodes.append(text_node_to_html_node(node))
+def paragraph_blocks(block):
+    text = block.strip().replace("\n", " ")
+    leafnodes = text_to_html_nodes(text)
 
-            html_nodes.append(ParentNode("p", leafnodes))
+    return ParentNode("p", leafnodes)
 
-        if block_type == BlockType.CODE:
-            text = re.sub(r"^`{3}|`{3}$", "", block).lstrip()
-            leafnodes = [LeafNode("code", text)]
-            html_nodes.append(ParentNode("pre", leafnodes))
 
-    final_node = ParentNode("div", html_nodes)
-    return final_node
+def blockquote_blocks(block):
+    text = re.sub(r"^>\s", "", block).strip().replace("\n", " ")
+    leafnodes = text_to_html_nodes(text)
+
+    return ParentNode("blockquote", leafnodes)
+
+
+def olist_blocks(block):
+    text = re.sub(r"^\d+\.\s", "", block, flags=re.MULTILINE)
+    list_items = text.strip().split("\n")
+    list_nodes = []
+    for item in list_items:
+        leafnodes = text_to_html_nodes(item)
+        list_nodes.append(ParentNode("li", leafnodes))
+
+    return ParentNode("ol", list_nodes)
+
+
+def ulist_blocks(block):
+    text = re.sub(r"^-\s", "", block, flags=re.MULTILINE)
+    list_items = text.strip().split("\n")
+    list_nodes = []
+    for item in list_items:
+        leafnodes = text_to_html_nodes(item)
+        list_nodes.append(ParentNode("li", leafnodes))
+
+    return ParentNode("ul", list_nodes)
+
+
+def code_blocks(block):
+    text = re.sub(r"^`{3}|`{3}$", "", block).lstrip()
+    return ParentNode("pre", [LeafNode("code", text)])
+
+
+def text_to_html_nodes(text):
+    textnodes = text_to_textnodes(text)
+    html_nodes = []
+    for textnode in textnodes:
+        html_node = text_node_to_html_node(textnode)
+        html_nodes.append(html_node)
+    return html_nodes
 
 
 def markdown_to_blocks(markdown):
