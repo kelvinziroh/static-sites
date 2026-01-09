@@ -8,10 +8,10 @@ from generate import generate_pages_r
 
 def main():
     # capture base path
-    if sys.argv[1]:
-        basepath = sys.argv[1]
-    else:
+    if len(sys.argv) < 2:
         basepath = "/"
+    else:
+        basepath = sys.argv[1]
 
     # Copy, template, content generation src and dest directories
     cp_src = "./static"
