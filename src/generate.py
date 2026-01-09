@@ -4,7 +4,7 @@ from pathlib import Path
 from block_md import markdown_to_blocks, markdown_to_html_node
 
 
-def generate_pages_r(src_path, template_path, dest_path):
+def generate_pages_r(basepath, src_path, template_path, dest_path):
     if not os.path.exists(dest_path):
         os.mkdir(dest_path)
 
@@ -15,13 +15,14 @@ def generate_pages_r(src_path, template_path, dest_path):
             file_obj = Path(new_src_path)
             file_name = file_obj.stem
             new_dest_path = Path(dest_path) / f"{file_name}.html"
-            generate_page(new_src_path, template_path, new_dest_path)
+            generate_page(basepath, new_src_path, template_path, new_dest_path)
         else:
             new_dest_path = os.path.join(dest_path, item)
-            generate_pages_r(new_src_path, template_path, new_dest_path)
+            generate_pages_r(basepath, new_src_path, template_path, new_dest_path)
 
 
-def generate_page(src_path, template_path, dest_path):
+def generate_page(basepath, src_path, template_path, dest_path):
+    print(f'* src:"{src_path}" temp:"{template_path}" -> dest:"{dest_path}"')
     with open(src_path, "r") as file:
         md = file.read()
 
@@ -33,6 +34,8 @@ def generate_page(src_path, template_path, dest_path):
 
     filled_template = template.replace("{{ Title }}", title)
     filled_template = template.replace("{{ Content }}", html_content)
+    filled_template = template.replace('href="/', f'href="{basepath}')
+    filled_template = template.replace('src="/', f'src="{basepath}')
 
     dest_dir = os.path.dirname(dest_path)
     if not os.path.exists(dest_dir):

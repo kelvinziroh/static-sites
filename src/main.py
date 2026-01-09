@@ -1,25 +1,34 @@
 import os
 import shutil
+import sys
 
 from copy_static import copy_files
 from generate import generate_pages_r
 
-src_dir = "static"
-dest_dir = "public"
-
 
 def main():
-    is_dest = os.path.exists(dest_dir)
+    # capture base path
+    if sys.argv[0]:
+        basepath = sys.argv[0]
+    else:
+        basepath = "/"
+
+    # Copy, template, content generation src and dest directories
+    cp_src = "./static"
+    gen_src = "./content"
+    template_src = "./template.html"
+    dest = "./docs"
 
     # delete existing destination
+    is_dest = os.path.exists(dest)
     if is_dest:
-        shutil.rmtree(dest_dir)
+        shutil.rmtree(dest)
 
     # Recursively copy static files and directories to the public dir
-    copy_files(src_dir, dest_dir)
+    copy_files(cp_src, dest)
 
     # Recursively generate content to the public dir
-    generate_pages_r("content", "template.html", "public")
+    generate_pages_r(basepath, gen_src, template_src, dest)
 
 
 if __name__ == "__main__":
