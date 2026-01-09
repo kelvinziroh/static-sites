@@ -23,26 +23,30 @@ def generate_pages_r(basepath, src_path, template_path, dest_path):
 
 def generate_page(basepath, src_path, template_path, dest_path):
     print(f'* src:"{src_path}" temp:"{template_path}" -> dest:"{dest_path}"')
-    with open(src_path, "r") as file:
-        md = file.read()
 
+    # read src and template files
+    with open(src_path, "r") as src_file:
+        md = src_file.read()
+
+    with open(template_path, "r") as temp_file:
+        template = temp_file.read()
+
+    # Get title and html content
     title = extract_title(md)
     html_content = markdown_to_html_node(md).to_html()
 
-    with open(template_path, "r") as file:
-        template = file.read()
-
+    # Substitute content into the template
     filled_template = template.replace("{{ Title }}", title)
-    filled_template = template.replace("{{ Content }}", html_content)
-    filled_template = template.replace('href="/', f'href="{basepath}')
-    filled_template = template.replace('src="/', f'src="{basepath}')
+    filled_template = filled_template.replace("{{ Content }}", html_content)
+    filled_template = filled_template.replace('href="/', f'href="{basepath}')
+    filled_template = filled_template.replace('src="/', f'src="{basepath}')
 
     dest_dir = os.path.dirname(dest_path)
     if not os.path.exists(dest_dir):
         os.makedirs(dest_dir)
 
-    with open(dest_path, "w") as file:
-        file.write(filled_template)
+    with open(dest_path, "w") as dest_file:
+        dest_file.write(filled_template)
 
 
 def extract_title(markdown):
